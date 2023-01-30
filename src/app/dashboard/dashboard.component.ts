@@ -1,88 +1,88 @@
-import { Component, Inject } from '@angular/core';
-import { map } from 'rxjs/operators';
+import { Component, Inject, OnInit } from '@angular/core';
 import {DataSource} from '@angular/cdk/collections';
 import {Observable, ReplaySubject} from 'rxjs';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Producto } from '../interface/producto';
+import { ProductosService } from '../services/productos.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import Swal from 'sweetalert2';
 
-export interface PeriodicElement {
-  codigo: number;
-  descripcion: string;
-  precio: number;
-  symbol: string;
-}
-
-const ELEMENT_DATA: PeriodicElement[] = [
-  {codigo: 1, descripcion: 'Hydrogen', precio: 1.0079, symbol: 'H'},
-  {codigo: 2, descripcion: 'Helium', precio: 4.0026, symbol: 'He'},
-  {codigo: 3, descripcion: 'Lithium', precio: 6.941, symbol: 'Li'},
-  {codigo: 4, descripcion: 'Beryllium', precio: 9.0122, symbol: 'Be'},
-  {codigo: 5, descripcion: 'Boron', precio: 10.811, symbol: 'B'},
-  {codigo: 6, descripcion: 'Carbon', precio: 12.0107, symbol: 'C'},
-  {codigo: 7, descripcion: 'Nitrogen', precio: 14.0067, symbol: 'N'},
-  {codigo: 8, descripcion: 'Oxygen', precio: 15.9994, symbol: 'O'},
-  {codigo: 9, descripcion: 'Fluorine', precio: 18.9984, symbol: 'F'},
-  {codigo: 10, descripcion: 'Neon', precio: 20.1797, symbol: 'Ne'},
-];
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent {
-  displayedColumns: string[] = ['position', 'name', 'weight', 'symbol'];
-  dataToDisplay = [...ELEMENT_DATA];
+export class DashboardComponent implements OnInit{
 
-  //Almacena los valores del producto a eliminar
-  codigo!: number;
-  descripcion!: string;
-  precio!: number;
+  displayedColumns: string[] = ['Codigo', 'Descripcion', 'Precio', 'Opciones']; //Encabezados de la Tabla
+  productos!:Producto[]; //almacenara los producto desde el servicio
+  constructor(public dialog: MatDialog,private productoService: ProductosService) {}
 
-  //Métodos para Borrar Producto
-  constructor(public dialog: MatDialog) {}
+  ngOnInit(): void {
+    this.getProducto();
+  }
 
-  openDialog(): void {
-    const dialogRef = this.dialog.open(DialogOverviewProducto, {
-      data: {codigo: this.codigo, descripcion: this.descripcion, precio: this.precio},
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-      this.descripcion = result;
+  getProducto(){
+    this.productoService.getProducto().subscribe(productos => {
+      this.productos = productos; //lo guardamos en el array
+      this.productos.sort((a, b) => a.codigo - b.codigo); //lo ordenamos ascendente
+      this.dataSource = new ExampleDataSource(this.productos); //actualizamos la tabla
+      
     });
   }
   
+
   //Métodos para la Tabla
-  dataSource = new ExampleDataSource(this.dataToDisplay);
+  dataSource = new ExampleDataSource(this.productos);
+  //Agregar Producto después de cerrar el dialog
+  openDialog(): void {
+    const dialogRef = this.dialog.open(DialogOverviewProducto)
 
-  addData() {
-    const randomElementIndex = Math.floor(Math.random() * ELEMENT_DATA.length);
-    this.dataToDisplay = [...this.dataToDisplay, ELEMENT_DATA[randomElementIndex]];
-    this.dataSource.setData(this.dataToDisplay);
+    dialogRef.afterClosed().subscribe(result => {
+      this.getProducto()
+      this.dataSource.setData(result); //el result almacena los valores del formulario solo si existe valores enviados
+    });
   }
-
-  removeData() {
-    this.dataToDisplay = this.dataToDisplay.slice(0, -1);
-    this.dataSource.setData(this.dataToDisplay);
+  //Eliminar Producto
+  removeData(producto:Producto) {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "No podrás revertir esto!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, eliminarlo!'
+    }).then((result) => {
+      if (result.value) {
+        this.productoService.deleteProducto(producto);
+        Swal.fire(
+          'Eliminado!',
+          'El producto ha sido eliminado.',
+          'success'
+        )
+      }
+    });
   }
 
 }
 
-class ExampleDataSource extends DataSource<PeriodicElement> {
-  private _dataStream = new ReplaySubject<PeriodicElement[]>();
+class ExampleDataSource extends DataSource<Producto> {
+  private _dataStream = new ReplaySubject<Producto[]>();
 
-  constructor(initialData: PeriodicElement[]) {
+  constructor(initialData: Producto[]) {
     super();
     this.setData(initialData);
   }
 
-  connect(): Observable<PeriodicElement[]> {
+  connect(): Observable<Producto[]> {
     return this._dataStream;
   }
 
   disconnect() {}
 
-  setData(data: PeriodicElement[]) {
+  setData(data: Producto[]) {
     this._dataStream.next(data);
   }
 }
@@ -92,14 +92,59 @@ class ExampleDataSource extends DataSource<PeriodicElement> {
 @Component({
   selector: 'dialog-overview-producto',
   templateUrl: './producto-dialog.html',
+  styleUrls: ['./dashboard.component.css']
 })
-export class DialogOverviewProducto {
-  constructor(
+export class DialogOverviewProducto implements OnInit{
+  codigo!: string;
+  descripcion!: string;
+  precio!: number;
+  public formRegistro !: FormGroup;
+
+  constructor(private productoService: ProductosService, private formBuilder:FormBuilder,
     public dialogRef: MatDialogRef<DialogOverviewProducto>,
-    @Inject(MAT_DIALOG_DATA) public data: PeriodicElement,
+    @Inject(MAT_DIALOG_DATA) public data: any
   ) {}
 
+  ngOnInit(): void {
+    //declaramos las validaciones del formulario reactivo
+    this.formRegistro = this.formBuilder.group({
+      codigo:['',[
+        Validators.required,
+        Validators.minLength(1),
+        Validators.pattern(/^[0-9]+$/)
+      ]] ,
+      descripcion:['',[
+        Validators.required,
+        Validators.minLength(4)
+      ]] ,
+      precio:['',[
+        Validators.required,
+        Validators.pattern(/^[0-9.]+$/) //solo números y punto
+      ]]
+    })
+  }
+  //registraremos nuestro producto en Firebase
+  async register(){
+    this.productoService.addProducto(this.formRegistro.value)
+  .then(() => {
+    Swal.fire(
+      'Agregado!',
+      'El producto ha sido agregado.',
+      'success'
+    );
+    this.dialogRef.close(this.formRegistro.value);
+  })
+  .catch(error => {
+    Swal.fire(
+      'Error!',
+      'Ha ocurrido un error al agregar el producto.',
+      'error'
+    );
+  });
+  }
+
   onNoClick(): void {
+    //si le da en cancelar no enviamos nada
     this.dialogRef.close();
   }
 }

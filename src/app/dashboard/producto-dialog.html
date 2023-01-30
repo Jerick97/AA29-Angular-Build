@@ -1,32 +1,52 @@
 <h1 mat-dialog-title>Articulo</h1>
 <div mat-dialog-content>
-    <p>
-        <mat-form-field appearance="outline">
-            <mat-label>Código</mat-label>
-            <input matInput placeholder="Código" [(ngModel)]="data.codigo">
-            <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
-            <mat-hint>Hint</mat-hint>
-        </mat-form-field>
-    </p>
-    <p>
-        <mat-form-field appearance="outline">
-            <mat-label>Descripción</mat-label>
-            <input matInput placeholder="Descripción" [(ngModel)]="data.descripcion">
-            <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
-            <mat-hint>Hint</mat-hint>
-        </mat-form-field>
-    </p> 
-    <p>
-        <mat-form-field appearance="outline">
-            <mat-label>Precio</mat-label>
-            <input matInput placeholder="Precio" [(ngModel)]="data.precio">
-            <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
-            <mat-hint>Hint</mat-hint>
-        </mat-form-field>
-    </p>
+    <form autocomplete="off" [formGroup]="formRegistro" (submit)="register()">
+        <p>
+            <mat-form-field appearance="outline">
+                <mat-label>Ingrese Código</mat-label>
+                <input matInput placeholder="Código" type="text" formControlName="codigo">
+                <mat-icon matSuffix> vpn_key</mat-icon>
+                <mat-hint *ngIf="formRegistro.get('codigo')?.valid">Correcto</mat-hint>
+                <mat-error *ngIf="formRegistro.get('codigo')?.touched && formRegistro.get('codigo')?.errors?.['required']">
+                    Codigo es <strong>requerido</strong>
+                </mat-error>
+                <mat-error *ngIf="formRegistro.get('codigo')?.errors?.['minlength']&& formRegistro.get('codigo')?.touched">
+                    Debe Tener como mínimo {{formRegistro.get('codigo')?.errors?.['minlength']?.requiredLength}} caracteres
+                </mat-error>
+                <mat-error *ngIf="formRegistro.get('codigo')?.touched && formRegistro.get('codigo')?.errors?.['pattern']">
+                    Solo se permite números
+                </mat-error>
+            </mat-form-field>
+        </p>
+        <p>
+            <mat-form-field appearance="outline">
+                <mat-label>Ingrese Descripción</mat-label>
+                <input matInput placeholder="Descripción" type="text" formControlName="descripcion">
+                <mat-icon matSuffix> vpn_key</mat-icon>
+                <mat-hint *ngIf="formRegistro.get('descripcion')?.valid">Correcto</mat-hint>
+                <mat-error *ngIf="formRegistro.get('descripcion')?.touched && formRegistro.get('descripcion')?.errors?.['required']">
+                    Descripción es <strong>requerido</strong>
+                </mat-error>
+                <mat-error *ngIf="formRegistro.get('descripcion')?.errors?.['minlength']&& formRegistro.get('descripcion')?.touched">
+                    Debe Tener como mínimo {{formRegistro.get('descripcion')?.errors?.['minlength']?.requiredLength}} caracteres
+                </mat-error>
+            </mat-form-field>
+        </p> 
+        <p>
+            <mat-form-field appearance="outline">
+                <mat-label>Ingrese Precio</mat-label>
+                <input matInput placeholder="Precio" type="number" formControlName="precio">
+                <mat-icon matSuffix> vpn_key</mat-icon>
+                <mat-hint *ngIf="formRegistro.get('precio')?.valid">Correcto</mat-hint>
+                <mat-error *ngIf="formRegistro.get('precio')?.touched && formRegistro.get('precio')?.errors?.['required']">
+                    Precio es <strong>requerido</strong>
+                </mat-error>
+            </mat-form-field>
+        </p>
+    </form>
 </div>
 
 <div mat-dialog-actions>
     <button mat-flat-button color="warn" (click)="onNoClick()">Cancelar</button>
-    <button mat-flat-button color="primary" [mat-dialog-close]="data.descripcion" cdkFocusInitial>Ok</button>
+    <button mat-flat-button color="primary" (click)="register()" cdkFocusInitial [disabled]="formRegistro.invalid">Confirmar</button>
 </div>

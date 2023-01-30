@@ -35,3 +35,13 @@
 .demo-button + .demo-button {
   margin-left: 8px;
 }
+
+.table__column{
+  text-align: center;
+  font-size: 18px;
+}
+
+.mat-hint {
+	color: green !important;
+  font-size: 13px;
+}
