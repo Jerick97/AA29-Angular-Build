@@ -1,23 +1,32 @@
 <h1 mat-dialog-title>Articulo</h1>
 <div mat-dialog-content>
-    <mat-form-field appearance="fill">
-        <p>Código</p>
-        <mat-label>Código</mat-label>
-        <input matInput [(ngModel)]="data.codigo">
-    </mat-form-field>
-    <mat-form-field appearance="fill">
-        <p>Descripción</p>
-        <mat-label>Descripción</mat-label>
-        <input matInput [(ngModel)]="data.codigo">
-    </mat-form-field>
-    <mat-form-field appearance="fill">
-        <p>Precio</p>
-        <mat-label>Precio</mat-label>
-        <input matInput [(ngModel)]="data.codigo">
-    </mat-form-field>
+    <p>
+        <mat-form-field appearance="outline">
+            <mat-label>Código</mat-label>
+            <input matInput placeholder="Código" [(ngModel)]="data.codigo">
+            <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
+            <mat-hint>Hint</mat-hint>
+        </mat-form-field>
+    </p>
+    <p>
+        <mat-form-field appearance="outline">
+            <mat-label>Descripción</mat-label>
+            <input matInput placeholder="Descripción" [(ngModel)]="data.descripcion">
+            <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
+            <mat-hint>Hint</mat-hint>
+        </mat-form-field>
+    </p> 
+    <p>
+        <mat-form-field appearance="outline">
+            <mat-label>Precio</mat-label>
+            <input matInput placeholder="Precio" [(ngModel)]="data.precio">
+            <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
+            <mat-hint>Hint</mat-hint>
+        </mat-form-field>
+    </p>
 </div>
 
 <div mat-dialog-actions>
-    <button mat-button (click)="onNoClick()">Cancelar</button>
-    <button mat-button [mat-dialog-close]="data.descripcion" cdkFocusInitial>Ok</button>
+    <button mat-flat-button color="warn" (click)="onNoClick()">Cancelar</button>
+    <button mat-flat-button color="primary" [mat-dialog-close]="data.descripcion" cdkFocusInitial>Ok</button>
 </div>
