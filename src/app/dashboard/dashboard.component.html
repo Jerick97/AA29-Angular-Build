@@ -1,0 +1,72 @@
+<div class="grid-container">
+  <h1 class="mat-h1">Dashboard</h1>
+  <mat-grid-list cols="2" rowHeight="800px">
+    <mat-grid-tile>
+      <mat-card class="dashboard-card">
+        <mat-card-header>
+          <mat-card-title>
+            Tienda de Productos
+            <button mat-icon-button class="more-button" [matMenuTriggerFor]="menu" aria-label="Toggle menu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu" xPosition="before">
+              <button mat-menu-item>Expand</button>
+              <button mat-menu-item>Remove</button>
+            </mat-menu>
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="dashboard-card-content">
+          <!--Tabla de Productos-->
+          <div class="demo-button-container">
+            <button mat-raised-button (click)="addData()" class="demo-button">
+              Add Data
+            </button>
+            <button
+                mat-raised-button
+                [disabled]="!dataToDisplay.length"
+                (click)="removeData()"
+                class="demo-button">
+              Remove data
+            </button>
+            <button
+                mat-raised-button
+                [disabled]="!dataToDisplay.length"
+                (click)="openDialog()"
+                class="demo-button">
+              Añadir Producto
+            </button>
+          </div>
+          
+          <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 demo-table">
+            <!-- Position Column -->
+            <ng-container matColumnDef="position">
+              <th mat-header-cell *matHeaderCellDef>Código</th>
+              <td mat-cell *matCellDef="let element">{{element.codigo}}</td>
+            </ng-container>
+          
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Descripción</th>
+              <td mat-cell *matCellDef="let element">{{element.descripcion}}</td>
+            </ng-container>
+          
+            <!-- Weight Column -->
+            <ng-container matColumnDef="weight">
+              <th mat-header-cell *matHeaderCellDef>Precio</th>
+              <td mat-cell *matCellDef="let element">{{element.precio}}</td>
+            </ng-container>
+          
+            <!-- Symbol Column -->
+            <ng-container matColumnDef="symbol">
+              <th mat-header-cell *matHeaderCellDef>Opciones</th>
+              <td mat-cell *matCellDef="let element"><button mat-raised-button color="warn"><mat-icon>delete_forever</mat-icon> Borrar</button></td>
+            </ng-container>
+          
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>          
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+  </mat-grid-list>
+</div>

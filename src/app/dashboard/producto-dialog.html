@@ -1,0 +1,23 @@
+<h1 mat-dialog-title>Articulo</h1>
+<div mat-dialog-content>
+    <mat-form-field appearance="fill">
+        <p>Código</p>
+        <mat-label>Código</mat-label>
+        <input matInput [(ngModel)]="data.codigo">
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+        <p>Descripción</p>
+        <mat-label>Descripción</mat-label>
+        <input matInput [(ngModel)]="data.codigo">
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+        <p>Precio</p>
+        <mat-label>Precio</mat-label>
+        <input matInput [(ngModel)]="data.codigo">
+    </mat-form-field>
+</div>
+
+<div mat-dialog-actions>
+    <button mat-button (click)="onNoClick()">Cancelar</button>
+    <button mat-button [mat-dialog-close]="data.descripcion" cdkFocusInitial>Ok</button>
+</div>
